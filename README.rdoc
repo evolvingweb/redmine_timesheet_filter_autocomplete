@@ -1,0 +1,4 @@
+= redmine_timesheet_filter_autocomplete
+
+This plugins adds a super-powered autocomplete filter to time report filters so that you can filter
+by user, project and other available fields by simply autocompleting.
