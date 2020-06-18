@@ -1,0 +1,8 @@
+#tr_autocomplete label {
+  font-size: 16px;
+  padding-left: 5px;
+}
+.input-autocomplete.value {
+  height: 30px;
+  width: 200px;
+}
