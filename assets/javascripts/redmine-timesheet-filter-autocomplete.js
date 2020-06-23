@@ -6,12 +6,22 @@ $(document).ready(function() {
         $autocompleteFilter.append($('<td class="value"></td>'));
         $autocompleteFilter.children('.value').append($autocompleteInput);
         $('#filters-table tbody').prepend($autocompleteFilter);
+
+        // Autocomplete source.
+        var source = '/timesheet/filter/autocomplete';
+        const regex = /^\/projects\/(.+)\//;
+        var matches;
+        if ((matches = regex.exec(window.location.pathname)) !== null) {
+            if (matches[1]) {
+                source = '/timesheet/filter/' + matches[1] + '/autocomplete';
+            }
+        }
         
         $autocompleteInput.autocomplete({
             autoFocus: true,
             delay: 300,
             minLength: 2,
-            source: "/timesheet/filter/autocomplete",
+            source: source,
             select: function(event, ui) {
                 var id = ui.item.id;
                 var parts = id.split('/');
