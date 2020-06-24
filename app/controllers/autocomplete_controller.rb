@@ -1,8 +1,10 @@
 class AutocompleteController < ApplicationController
     def autocomplete()
         data = []
-        data = data + users_search(params[:term])
-        data = data + projects_search(params[:term])
+        data = data + users_search(params)
+        if !params.key?(:identifier)
+            data = data + projects_search(params[:term])
+        end
         data = data + dates_search(params[:term])
 
         respond_to do |format|
@@ -12,9 +14,19 @@ class AutocompleteController < ApplicationController
         end
     end
 
-    def users_search(search)
+    def users_search(params)
+        search = params[:term]
         data = []
+        project_id = 3
         users = User.where("login LIKE :search OR firstname LIKE :search OR lastname LIKE :search OR CONCAT(firstname, ' ', lastname  ) LIKE :search", {search: "%#{search}%"})
+        if params.key?(:identifier)
+            project = Project.find_by(identifier: params[:identifier])
+            if project
+                project_id = project.id
+                # Filter by only project members.
+                users = users.joins("INNER JOIN members on members.user_id = users.id").where("members.project_id = :project_id", {project_id: project_id})
+            end
+        end
         users.each do |user|
             data << {
                 id: "user_id/=/#{user.id}",
