@@ -43,6 +43,13 @@ $(document).ready(function() {
                     if (value) {
                         urlParams.set('v[' + filter_id + '][]', value);
                     }
+                    if (issue_id_value = urlParams.get('issue_id')) {
+                        // Handle if coming from issue time entries.
+                        urlParams.append('f[]', 'issue_id');
+                        urlParams.set('op[issue_id]', '~');
+                        urlParams.append('v[issue_id][]', issue_id_value.substring(1));
+                        urlParams.delete('issue_id');
+                    }
                     window.location.href = window.location.origin + window.location.pathname + '?' + urlParams.toString();
                 }
             }
