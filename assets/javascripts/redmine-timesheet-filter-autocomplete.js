@@ -8,7 +8,57 @@ $(document).ready(function() {
         $('#filters-table tbody').prepend($autocompleteFilter);
 
         // Autocomplete source.
-        var source = '/timesheet/filter/autocomplete';
+        var source = function(request, response) {
+            var processed = false;
+            search = request.term;
+            const regex = /^(until|since)?\s?(.*)$/mi;
+            matches = regex.exec(search)
+            keyword = 'since';
+            value = ''
+            if (matches[1]) {
+                keyword = matches[1];
+            }
+            if (matches[2]) {
+                value = matches[2];
+            }
+            if (value) {
+                parsedDate = Sugar.Date.create(value);
+                if (parsedDate != 'Invalid Date') {
+                    operator = '';
+                    filter_id = 'spent_on';
+                    parsedValue = dateToYMD(parsedDate);
+                    if (keyword.toLowerCase() === 'since') {
+                        operator = '>=';
+                    }
+                    else if (keyword.toLowerCase() === 'until') {
+                        operator = '<=';
+                    }
+                    id = 'spent_on/' + operator + '/' + parsedValue
+                    data = [
+                        {
+                            id: id,
+                            label: search
+                        }
+                    ];
+                    response(data);
+                    processed = true;
+                }
+            }
+            if (!processed) {
+                // If not returned, process as ajax.
+                var url = "/timesheet/filter/autocomplete?term=" + search;
+                $.ajax({
+                    url: url,
+                    success: function(data) {
+                        var parsed = JSON.parse(data);
+                        response(parsed);
+                    },
+                    error: function() {
+                        response([]);
+                    },
+                });
+            }
+        };
         const regex = /^\/projects\/(.+)\//;
         var matches;
         if ((matches = regex.exec(window.location.pathname)) !== null) {
@@ -16,6 +66,13 @@ $(document).ready(function() {
                 source = '/timesheet/filter/' + matches[1] + '/autocomplete';
             }
         }
+
+        const dateToYMD = function(date) {
+            var d = date.getDate();
+            var m = date.getMonth() + 1; //Month from 0 to 11
+            var y = date.getFullYear();
+            return '' + y + '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d);
+        };
         
         $autocompleteInput.autocomplete({
             autoFocus: true,

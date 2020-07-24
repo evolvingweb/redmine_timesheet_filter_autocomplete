@@ -3,7 +3,7 @@ module TimesheetFilterAutocomplete
       def view_layouts_base_html_head(context={})
         p = context[:request].params
         if p[:controller] == "timelog" && (p[:action] == "report" || p[:action] == "index")
-          js_files = %w{redmine-timesheet-filter-autocomplete.js}
+          js_files = %w{sugar-custom.min.js redmine-timesheet-filter-autocomplete.js}
           js_files.map do |file|
             javascript_include_tag(file, :plugin=> 'redmine_timesheet_filter_autocomplete')
           end
