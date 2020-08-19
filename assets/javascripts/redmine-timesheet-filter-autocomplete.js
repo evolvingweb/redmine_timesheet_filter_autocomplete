@@ -47,6 +47,13 @@ $(document).ready(function() {
             if (!processed) {
                 // If not returned, process as ajax.
                 var url = "/timesheet/filter/autocomplete?term=" + search;
+                const regex = /^\/projects\/(.+)\//;
+                var matches;
+                if ((matches = regex.exec(window.location.pathname)) !== null) {
+                    if (matches[1]) {
+                        url = '/timesheet/filter/' + matches[1] + '/autocomplete?term=' + search;
+                    }
+                }
                 $.ajax({
                     url: url,
                     success: function(data) {
@@ -59,13 +66,6 @@ $(document).ready(function() {
                 });
             }
         };
-        const regex = /^\/projects\/(.+)\//;
-        var matches;
-        if ((matches = regex.exec(window.location.pathname)) !== null) {
-            if (matches[1]) {
-                source = '/timesheet/filter/' + matches[1] + '/autocomplete';
-            }
-        }
 
         const dateToYMD = function(date) {
             var d = date.getDate();
